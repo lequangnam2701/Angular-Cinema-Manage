@@ -1,0 +1,39 @@
+<div class="container mx-auto px-4 py-8">
+  
+  <div *ngIf="loading" class="text-center py-8">
+    <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+    <p class="mt-4 text-gray-600">Đang tải...</p>
+  </div>
+  
+  <div *ngIf="error" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+    {{ error }}
+  </div>
+  
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 p-6  " *ngIf="!loading && !error">
+    <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 h-[700px] cursor-pointer" 
+         *ngFor="let movie of movies">
+      <img [src]="movie.posterImage" 
+           [alt]="movie.title" 
+           class="w-full h-[500px] object-cover">
+      <div class="p-4">
+        <h3 class="text-xl font-semibold text-gray-800 mb-2">{{ movie.title }}</h3>
+        <div class="flex items-center text-gray-600 text-sm">
+          <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path>
+          </svg>
+         <span>Duration: {{ formatRuntime(movie.runtimeMin) }}</span>
+
+        </div>
+        <div class="flex justify-center mt-4">
+  <button
+    class="inline-block bg-blue-600 text-white text-sm font-medium px-4 py-2 rounded hover:bg-blue-700 transition-colors duration-200"
+    (click)="viewMovieDetail(movie)"
+  >
+    Buy Ticket
+  </button>
+</div>
+
+      </div>
+    </div>
+  </div>
+</div>

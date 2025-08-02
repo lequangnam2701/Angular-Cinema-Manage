@@ -1,0 +1,71 @@
+    /* src/app/pages/admin/manage/manage-user/manage-user.component.css */
+
+/* Custom animations and utilities that Tailwind doesn't provide */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Modal animations */
+.modal-enter {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Focus styles for better accessibility */
+.focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Ensure table scrolls properly on mobile */
+.table-container {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Custom scrollbar for modal */
+.modal-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e0 #f7fafc;
+}
+
+.modal-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.modal-scrollbar::-webkit-scrollbar-track {
+  background: #f7fafc;
+}
+
+.modal-scrollbar::-webkit-scrollbar-thumb {
+  background: #cbd5e0;
+  border-radius: 3px;
+}
+
+.modal-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #a0aec0;
+}
+
+/* Ensure text doesn't break in table cells */
+.table-cell-content {
+  word-break: break-word;
+  min-width: 0;
+}
+
+/* Better focus styles for buttons */
+button:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Smooth transitions for all interactive elements */
+* {
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}

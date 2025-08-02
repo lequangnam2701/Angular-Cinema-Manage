@@ -1,0 +1,63 @@
+<div class="bg-white text-white min-h-screen p-5">
+  <div *ngIf="loading" class="text-center py-10">
+    <div class="text-lg text-black">Đang tải thông tin phim...</div>
+  </div>
+  <div *ngIf="error" class="text-center py-10">
+    <div class="text-red-400 text-lg">Lỗi: {{ error }}</div>
+  </div>
+  <div *ngIf="!loading && !error" class="max-w-6xl mx-auto">
+    <div class="flex flex-col lg:flex-row gap-8 mb-10">
+      <div class="flex-shrink-0">
+        <img
+          [src]="moviePoster"
+          [alt]="movieTitle"
+          class="w-full lg:w-72 h-auto rounded-2xl shadow-2xl mx-auto">
+      </div>
+
+      <div class="flex-1">
+        <h1 class="text-4xl lg:text-5xl font-bold mb-5 text-orange-500">
+          {{ movieTitle }}
+        </h1>
+        <div class="flex" *ngIf="movieDuration">
+          <span class="text-orange-500 font-bold w-24 flex-shrink-0">Duration:</span>
+          <span class="text-black">{{ movieDuration }} phút</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-gray-800 p-1 rounded-lg mb-8 overflow-x-auto">
+      <div class="flex gap-0.5 min-w-max">
+        <button
+          *ngFor="let date of availableDates; let i = index"
+          class="flex-1 min-w-28 bg-transparent border-0 text-gray-400 py-4 px-3
+                 cursor-pointer transition-all duration-300 rounded text-center
+                 hover:bg-gray-700"
+          [class.bg-orange-500]="selectedDateIndex === i"
+          [class.text-white]="selectedDateIndex === i"
+          (click)="selectDate(i)">
+          <div class="text-2xl font-bold mb-1">{{ formatDateNumber(date) }}</div>
+          <div class="text-sm opacity-90">{{ formatDayName(date) }}</div>
+        </button>
+      </div>
+    </div>
+
+    <div *ngIf="filteredShowings.length > 0"
+          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div *ngFor="let showing of filteredShowings"
+           class="bg-gray-800 p-4 rounded-lg border-l-4 border-orange-500 cursor-pointer
+                  hover:bg-gray-700 transition duration-200"
+           (click)="selectShowingTime(showing.id)"> <div class="text-xl font-bold text-orange-500 mb-1">
+          {{ showing.dateTime | date:'HH:mm' }}
+        </div>
+        <div class="text-gray-300 text-sm">
+          {{ showing.movieTitle }} - {{ showing.runtimeMin }}phút
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="filteredShowings.length === 0 && selectedDateIndex >= 0"
+          class="text-center py-10 text-gray-400 text-lg">
+      Không có suất chiếu cho ngày này
+    </div>
+  </div>
+</div>

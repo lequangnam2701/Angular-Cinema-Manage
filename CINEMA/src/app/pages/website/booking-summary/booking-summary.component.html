@@ -1,0 +1,62 @@
+<div class="container mx-auto p-5 max-w-4xl">
+  <h2 class="text-3xl font-bold mb-6 text-gray-800 text-center">Xác nhận nhận bạn đặt vé </h2>
+
+  <div *ngIf="movieDetails" class="bg-white p-6 rounded-lg shadow-md mb-6 border border-gray-200">
+    <h3 class="text-xl font-semibold mb-3 text-gray-700">Thông tin phim</h3>
+    <p class="text-gray-600"><strong>Phim:</strong> {{ movieDetails.title }}</p>
+    <p class="text-gray-600"><strong>Thời lượng:</strong> {{ movieDetails.runtime }}</p>
+    <p class="text-gray-600"><strong>Giờ chiếu:</strong> {{ movieDetails.showtime | date:'HH:mm dd/MM/yyyy' }}</p>
+    <p class="text-gray-600"><strong>Rạp:</strong> {{ movieDetails.cinema }}</p>
+  </div>
+  <div *ngIf="!movieDetails" class="bg-yellow-100 text-yellow-800 p-4 rounded-lg mb-4">
+    Không có thông tin phim.
+  </div>
+
+  <div *ngIf="selectedSeats.length > 0" class="bg-white p-6 rounded-lg shadow-md mb-6 border border-gray-200">
+    <h3 class="text-xl font-semibold mb-3 text-gray-700">Ghế đã chọn:</h3>
+    <div class="flex flex-wrap gap-2">
+      <span *ngFor="let seat of selectedSeats"
+            class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
+        {{ seat.seatLocation }} ({{ seat.seatTypeName | titlecase }}) - {{ formatPrice(getSeatPrice(seat.seatTypeName)) }}
+      </span>
+    </div>
+  </div>
+ 
+
+  <div *ngIf="selectedSnacksMap.size > 0" class="bg-white p-6 rounded-lg shadow-md mb-6 border border-gray-200">
+    <h3 class="text-xl font-semibold mb-3 text-gray-700">Đồ ăn & Thức uống:</h3>
+    <div class="space-y-2">
+      <div *ngFor="let item of selectedSnacksMap | keyvalue"
+           class="flex justify-between items-center text-gray-600">
+        <span class="font-medium">{{ item.value.snack.snackName }} x {{ item.value.quantity }}</span>
+        <span>{{ formatPrice(item.value.snack.price * item.value.quantity) }}</span>
+      </div>
+    </div>
+  </div>
+  <div *ngIf="selectedSnacksMap.size === 0" class="bg-gray-100 text-gray-700 p-4 rounded-lg mb-4">
+    Bạn chưa chọn đồ ăn/thức uống nào.
+  </div>
+
+
+  <div class="bg-white p-6 rounded-lg shadow-xl border border-blue-300">
+    <div class="flex justify-between items-center mb-4">
+      <span class="text-2xl font-bold text-gray-800">Tổng cộng:</span>
+      <span class="text-3xl font-extrabold text-orange-600">{{ formatPrice(grandTotal) }}</span>
+    </div>
+
+    <div *ngIf="errorMessage" class="text-red-600 bg-red-100 border border-red-300 p-3 rounded-lg mb-4 text-center">
+      {{ errorMessage }}
+    </div>
+
+    <div class="mt-4 flex justify-end">
+      <button
+        (click)="handlePaymentButtonClick()"
+        [disabled]="grandTotal <= 0 || isProcessing || !selectedSeats.length || !movieDetails"
+        class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg text-xl transition duration-300 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        <span *ngIf="!isProcessing">Thanh Toán VNPay</span>
+        <span *ngIf="isProcessing">Đang xử lý...</span>
+      </button>
+    </div>
+  </div>
+</div>

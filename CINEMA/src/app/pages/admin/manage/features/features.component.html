@@ -1,0 +1,103 @@
+<div class="max-w-7xl mx-auto p-6">
+  <h2 class="text-3xl font-bold text-gray-800 mb-8">Danh sách Features</h2>
+  <div class="flex gap-2 mb-4">
+    <button (click)="refreshFeatures()" 
+            class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50" 
+            [disabled]="loading">
+      <span *ngIf="loading">Đang tải...</span>
+      <span *ngIf="!loading">Làm mới</span>
+    </button>
+  </div>
+
+  <div *ngIf="loading" class="text-blue-500 font-medium flex items-center">
+    <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+    </svg>
+    Đang tải dữ liệu...
+  </div>
+
+  <div *ngIf="error" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">
+    <p class="font-medium">Lỗi:</p>
+    <p>{{ error }}</p>
+    <button (click)="refreshFeatures()" class="mt-2 bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700">
+      Thử lại
+    </button>
+  </div>
+
+  <div *ngIf="!loading && !error">
+    
+    <div *ngIf="features.length === 0" class="text-gray-500 text-center py-8">
+      <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+      </svg>
+      <p class="mt-2">Không có features nào được tìm thấy.</p>
+    </div>
+
+    <div *ngIf="features.length > 0">
+    
+      <div class="bg-gray-50 px-4 py-2 rounded mb-4">
+        <p class="text-sm text-black">
+          Tổng cộng: <span class="font-medium">{{ features.length }}</span> features
+        </p>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="min-w-full bg-white border border-gray-300 rounded-lg shadow-sm">
+          <thead class="bg-gray-100">
+            <tr>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">STT</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Feature Name</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Describe</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            <tr *ngFor="let feature of features; index as i; trackBy: trackByFeatureId" 
+                class="hover:bg-gray-50 transition-colors duration-200">
+                     
+              <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{{ i + 1 }}</td>
+              
+              <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">{{ feature.id }}</td>
+              
+              <td class="px-4 py-3 text-sm font-medium text-gray-900">
+                <div class="max-w-xs truncate" [title]="feature.name">{{ feature.name }}</div>
+              </td>
+             
+              <td class="px-4 py-3 text-sm text-gray-600">
+                <div class="max-w-md" [title]="feature.description">
+                  {{ feature.description.length > 100 ? (feature.description | slice:0:100) + '...' : feature.description }}
+                </div>
+              </td>
+              
+              <td class="px-4 py-3 whitespace-nowrap text-sm">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                  {{ feature.typeName }}
+                </span>
+              </td>
+              
+              <td class="px-4 py-3 whitespace-nowrap text-sm font-medium">
+                <div class="flex space-x-2">
+                  <button class="text-blue-600 hover:text-blue-900" title="Chỉnh sửa">
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                    </svg>
+                  </button>
+                  <button (click)="deleteFeature(feature.id, feature.name)" 
+                          class="text-red-600 hover:text-red-900" 
+                          title="Xóa">
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                    </svg>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

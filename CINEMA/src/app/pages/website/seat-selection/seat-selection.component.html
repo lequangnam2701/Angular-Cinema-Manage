@@ -1,0 +1,85 @@
+<div class="container mx-auto p-4 max-w-4xl">
+  <div class="bg-gray-800 text-white text-center py-3 mb-8 rounded-lg shadow-lg">
+    <p class="text-xl font-semibold">MÀN HÌNH</p>
+  </div>
+
+   <div class="seat-map-grid flex flex-col gap-2">
+    <div *ngFor="let rowKey of sortedRowKeys" class="flex items-center gap-2">
+      <div class="row-label text-white font-bold text-lg w-8 flex-shrink-0 text-center">
+        {{ rowKey }}
+      </div>
+      <div class="row-seats flex-1 grid gap-2"
+           [ngStyle]="{'grid-template-columns': 'repeat(' + maxColumnCount + ', 1fr)'}">
+        <ng-container *ngIf="seatsByRow.get(rowKey) as seatsInRow">
+          <div *ngFor="let seat of seatsInRow"
+               class="seat-item p-2 flex flex-col items-center justify-center rounded-lg border-2"
+               [ngClass]="getSeatClass(seat)"
+               (click)="toggleSeatSelection(seat)">
+            <fa-icon [icon]="faChair" class="text-2xl"></fa-icon>
+            <span class="text-xs font-semibold">{{ seat.column }}</span>
+            </div>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-8 flex flex-col items-center">
+    <h3 class="text-lg font-semibold mb-4">Chú thích màu sắc & Giá</h3>
+    <div class="flex flex-wrap gap-x-6 gap-y-4 justify-center text-sm">
+      <div class="flex items-center space-x-2">
+        <fa-icon [icon]="['fas', 'chair']" class="text-green-500"></fa-icon>
+        <span>Ghế thường ({{ formatPrice(seatPrices.standard) }})</span>
+      </div>
+      <div class="flex items-center space-x-2">
+        <fa-icon [icon]="['fas', 'chair']" class="text-orange-500"></fa-icon>
+        <span>Ghế Premium ({{ formatPrice(seatPrices.premium) }})</span>
+      </div>
+      <div class="flex items-center space-x-2">
+        <fa-icon [icon]="['fas', 'chair']" class="text-red-500"></fa-icon>
+        <span>Ghế VIP ({{ formatPrice(seatPrices.vip) }})</span>
+      </div>
+      <div class="flex items-center space-x-2">
+        <fa-icon [icon]="['fas', 'chair']" class="text-purple-500"></fa-icon>
+        <span>Ghế đôi ({{ formatPrice(seatPrices.couple) }})</span>
+      </div>
+      <div class="flex items-center space-x-2">
+        <fa-icon [icon]="['fas', 'chair']" class="text-cyan-500"></fa-icon>
+        <span>Ghế người khuyết tật ({{ formatPrice(seatPrices.wheelchair) }})</span>
+      </div>
+      <div class="flex items-center space-x-2">
+        <fa-icon [icon]="['fas', 'chair']" class="text-gray-400"></fa-icon>
+        <span>Ghế đã bán</span>
+      </div>
+      <div class="flex items-center space-x-2">
+        <fa-icon [icon]="['fas', 'chair']" class="text-blue-400"></fa-icon>
+        <span>Ghế đang chọn</span>
+      </div>
+      <div class="flex items-center space-x-2">
+        <div class="w-6 h-6 bg-yellow-500 rounded-full"></div>
+        <span>Lối đi</span>
+      </div>
+    </div>
+  </div>
+
+<div *ngIf="selectedSeats.length > 0" class="mt-8 p-4 bg-white rounded-lg shadow-md ">
+    <h3 class="text-xl font-semibold mb-3 text-black">Ghế đã chọn:</h3>
+    <div class="flex flex-wrap gap-2 mb-3">
+     <span *ngFor="let seat of selectedSeats"
+      class="bg-blue-600 px-3 py-1 rounded-full text-sm font-medium text-white">
+  {{ seat.seatLocation }} ({{ formatPrice(getSeatPrice(seat.seatTypeName)) }})
+</span>
+    </div>
+    <div class="text-right text-2xl font-bold text-orange-400">
+      Tổng cộng: {{ formatPrice(totalSelectedPrice) }}
+    </div>
+     <div class="mt-4 flex justify-end">
+      <button
+        (click)="goToSnackSelection()"
+        [disabled]="selectedSeats.length === 0"
+        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg text-lg transition duration-300 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        Tiếp theo
+      </button>
+    </div>
+  </div>
+</div>

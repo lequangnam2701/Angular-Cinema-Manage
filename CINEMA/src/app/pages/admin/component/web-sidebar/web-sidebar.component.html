@@ -1,0 +1,46 @@
+<div class="sidebar-container">
+  
+  <div class="sidebar-header">
+    <div class="header-content">
+      <div class="logo-container">
+        <span class="logo-text">M</span>
+      </div>
+      <div class="header-info">
+        <h2 class="title">Movi </h2>
+        
+      </div>
+    </div>
+  </div>
+  
+  <nav class="navigation">
+    <div class="nav-items">
+      <div 
+        *ngFor="let item of menuItems" 
+        class="nav-item"
+        [class.active]="isActive(item.path)"
+        (click)="navigateTo(item.path)">
+        <div class="glow-effect" [class.active]="isActive(item.path)"></div>
+        <div class="icon-container">
+          <span class="icon">{{ item.icon }}</span>
+        </div>
+        <span class="label">{{ item.label }}</span>
+        <div class="indicator" [class.active]="isActive(item.path)"></div>
+      </div>
+    </div>
+  </nav>
+  
+  <div class="sidebar-footer">
+    <div class="status-container">
+      <div class="status-content">
+        <div class="status-icon">
+          <div class="status-dot"></div>
+        </div>
+        <div class="status-info">
+          <p class="status-title">System Status</p>
+          <p class="status-value">Online</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+</div>

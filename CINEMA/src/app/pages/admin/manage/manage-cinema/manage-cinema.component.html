@@ -1,0 +1,301 @@
+
+<div class="max-w-7xl mx-auto p-6 bg-gray-50 min-h-screen">
+  <!-- Header -->
+  <div class="flex justify-between items-center mb-8 bg-white rounded-lg shadow-sm p-6">
+    <h2 class="text-3xl font-bold text-gray-800 mb-8">Cinema Management</h2>
+    <div class="flex space-x-3">
+      <button 
+        class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200 flex items-center"
+        (click)="toggleAddForm()"
+      >
+        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+        </svg>
+        {{ showAddForm ? 'Hide Form' : 'Add Cinema' }}
+      </button>
+    </div>
+  </div>
+
+  <div class="mb-6 space-y-4">
+    <div 
+      class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg flex items-center"
+      *ngIf="successMessage"
+    >
+      <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+      </svg>
+      {{ successMessage }}
+    </div>
+    <div 
+      class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg flex items-center"
+      *ngIf="errorMessage"
+    >
+      <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+      </svg>
+      {{ errorMessage }}
+    </div>
+  </div>
+
+  <div class="flex justify-center items-center py-8" *ngIf="isLoading">
+    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+    <span class="ml-3 text-gray-600">Loading...</span>
+  </div>
+
+  <div 
+    class="bg-white rounded-lg shadow-sm p-6 mb-8 transition-all duration-300 ease-in-out"
+    *ngIf="showAddForm"
+    [@slideInOut]
+  >
+    <div class="flex justify-between items-center mb-6">
+      <h3 class="text-xl font-semibold text-gray-800">
+        {{ isEditMode ? 'Edit Cinema' : 'Add New Cinema' }}
+      </h3>
+      <button 
+        class="text-gray-500 hover:text-gray-700 transition-colors duration-200"
+        (click)="closeForm()"
+      >
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+    
+    <!-- <form [formGroup]="cinemaForm" (ngSubmit)="onSubmit()" class="space-y-6">
+     
+      <div class="space-y-2">
+        <label for="name" class="block text-sm font-medium text-gray-700">
+          Cinema Name <span class="text-red-500">*</span>
+        </label>
+        <input 
+          type="text" 
+          id="name"
+          formControlName="name"
+          [class]="'w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 ' + (isFieldInvalid('name') ? 'border-red-500 bg-red-50' : 'border-gray-300')"
+          placeholder="Enter cinema name"
+        >
+      </div>
+
+      <div class="space-y-2">
+        <label for="stateId" class="block text-sm font-medium text-gray-700">
+          State ID <span class="text-red-500">*</span>
+        </label>
+        <input 
+          type="number" 
+          id="stateId"
+          formControlName="stateId"
+          [class]="'w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 ' + (isFieldInvalid('stateId') ? 'border-red-500 bg-red-50' : 'border-gray-300')"
+          placeholder="Enter state ID"
+          min="1"
+        >
+      </div>
+
+      <div class="space-y-2">
+        <label for="stateName" class="block text-sm font-medium text-gray-700">
+          State Name <span class="text-red-500">*</span>
+        </label>
+        <input 
+          type="text" 
+          id="stateName"
+          formControlName="stateName"
+          [class]="'w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 ' + (isFieldInvalid('stateName') ? 'border-red-500 bg-red-50' : 'border-gray-300')"
+          placeholder="Enter state name"
+        >
+      </div>
+
+      <div class="space-y-2">
+        <label for="image" class="block text-sm font-medium text-gray-700">
+          Image <span class="text-red-500">*</span>
+        </label>
+        <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-blue-400 transition-colors duration-200">
+          <input 
+            type="file" 
+            id="imageFile"
+            accept="image/*"
+            (change)="onFileSelected($event)"
+            class="hidden"
+          >
+          <label for="imageFile" class="cursor-pointer">
+            <svg class="w-8 h-8 mx-auto mb-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+            </svg>
+            <span class="text-sm text-gray-500">Choose file </span>
+          </label>
+        </div>
+      </div>
+
+      <div class="border rounded-lg p-4 bg-gray-50" *ngIf="cinemaForm.get('image')?.value">
+        <p class="text-sm text-gray-600 mb-2">Preview:</p>
+        <img 
+          [src]="cinemaForm.get('image')?.value" 
+          alt="Preview" 
+          class="max-w-xs max-h-48 rounded-lg shadow-sm border"
+        />
+      </div>
+
+      <div class="flex space-x-4 pt-4">
+        <button 
+          type="submit" 
+          class="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white px-6 py-2 rounded-lg font-medium transition-colors duration-200 flex items-center"
+          [disabled]="cinemaForm.invalid || isLoading"
+        >
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" *ngIf="!isLoading">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+          </svg>
+          <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2" *ngIf="isLoading"></div>
+          {{ isEditMode ? 'Update Cinema' : 'Create Cinema' }}
+        </button>
+        <button 
+          type="button" 
+          class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg font-medium transition-colors duration-200 flex items-center"
+          (click)="resetForm()"
+        >
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+          </svg>
+          Reset
+        </button>
+        <button 
+          type="button" 
+          class="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-lg font-medium transition-colors duration-200 flex items-center"
+          (click)="closeForm()"
+        >
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+          Cancel
+        </button>
+      </div>
+    </form> -->
+  </div>
+
+  <!-- Search and Filter -->
+  <div class="bg-white rounded-lg shadow-sm p-6 mb-8">
+    <h3 class="text-xl font-semibold text-gray-800 mb-6">Search & Filter</h3>
+    <div class="space-y-4 lg:space-y-0 lg:flex lg:items-center lg:space-x-4">
+      <div class="flex-1 flex space-x-2">
+        <input 
+          type="text" 
+          [(ngModel)]="searchTerm"
+          placeholder="Search by name..."
+          class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
+        >
+        <!-- <button 
+          class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200"
+          (click)="searchCinemas()"
+        >
+          Search
+        </button> -->
+      </div>
+      
+      <button 
+        class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200"
+        (click)="loadCinemas()"
+      >
+        Clear All
+      </button>
+    </div>
+  </div>`
+
+  <!-- Cinema List -->
+  <div class="bg-white rounded-lg shadow-sm p-6">
+    <div class="flex justify-between items-center mb-6">
+      <h3 class="text-xl font-semibold text-gray-800">Cinema List</h3>
+      <span class="bg-blue-100 text-blue-800 text-sm font-medium px-2.5 py-0.5 rounded">
+        {{ totalItems }} items
+      </span>
+    </div>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" *ngIf="cinemas.length > 0">
+      <div 
+        class="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden"
+        *ngFor="let cinema of cinemas; trackBy: trackByCinema"
+      >
+        <div class="h-48 bg-gray-100 overflow-hidden">
+          <img 
+            [src]="cinema.image" 
+            [alt]="cinema.name" 
+            class="w-full h-full object-cover"
+          />
+        </div>
+        
+        <div class="p-4">
+          <h4 class="text-lg font-semibold text-gray-800 mb-2">{{ cinema.name }}</h4>
+          <div class="space-y-1 text-sm text-gray-600 mb-4">
+            <p><span class="font-medium">ID:</span> {{ cinema.id }}</p>
+            <p><span class="font-medium">State:</span> {{ cinema.stateName }} ({{ cinema.stateId }})</p>
+          </div>
+          
+          <div class="flex space-x-2">
+            <button 
+              class="flex-1 bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-200 flex items-center justify-center"
+              (click)="editCinema(cinema)"
+            >
+              <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+              </svg>
+              Edit
+            </button>
+            <button 
+              class="flex-1 bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-200 flex items-center justify-center"
+              (click)="confirmDelete(cinema)"
+            >
+              <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+              </svg>
+              Delete
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="text-center py-12 text-gray-500" *ngIf="cinemas.length === 0 && !isLoading">
+      <svg class="w-12 h-12 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+      </svg>
+      <p class="text-lg">No cinemas found</p>
+      <p class="text-sm">Try adjusting your search or filters</p>
+    </div>
+  </div>
+
+  
+  <div 
+    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+    *ngIf="showDeleteConfirm"
+  >
+    <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+      <div class="p-6">
+        <div class="flex items-center mb-4">
+          <svg class="w-6 h-6 text-red-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+          </svg>
+          <h3 class="text-lg font-semibold text-gray-800">Confirm Delete</h3>
+        </div>
+        
+        <div class="mb-6">
+          <p class="text-gray-600 mb-2">
+            Are you sure you want to delete 
+            <span class="font-semibold">{{ cinemaToDelete?.name }}</span>?
+          </p>
+          <p class="text-sm text-gray-500">This action cannot be undone.</p>
+        </div>
+        
+        <div class="flex space-x-3">
+          <button 
+            class="flex-1 bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200"
+            (click)="cancelDelete()"
+          >
+            Cancel
+          </button>
+          <!-- <button 
+            class="flex-1 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200"
+            (click)="deleteCinema()"
+          >
+            Delete
+          </button> -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

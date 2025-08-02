@@ -1,0 +1,273 @@
+<div class="max-w-7xl mx-auto p-6">
+  <div class="flex justify-between items-center mb-8">
+    <h2 class="text-3xl font-bold text-gray-900">Snacks Management</h2>
+    <button 
+      class="px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-200 shadow-md"
+      (click)="openAddForm()">
+      <svg class="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+      </svg>
+      Add New Snack
+    </button>
+  </div>
+
+  <!-- Loading Indicator -->
+  <div *ngIf="isLoading" class="text-center py-8">
+    <div class="text-xl text-gray-600">Loading snacks...</div>
+  </div>
+
+  <!-- Add New Snack Modal -->
+  <div *ngIf="isAddingSnack" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-screen overflow-y-auto">
+      <div class="flex justify-between items-center bg-gray-50 px-6 py-4 border-b border-gray-200 rounded-t-lg">
+        <h4 class="text-xl font-semibold text-gray-800">Add New Snack</h4>
+        <button 
+          class="text-gray-400 hover:text-gray-600 focus:outline-none focus:text-gray-600 transition duration-200"
+          (click)="closeAddForm()">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+      <div class="p-6">
+        <form (ngSubmit)="createSnack()" #snackForm="ngForm">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label for="snackName" class="block text-sm font-medium text-gray-700 mb-2">
+                Snack Name:
+              </label>
+              <input 
+                type="text" 
+                id="snackName"
+                class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                [(ngModel)]="newSnack.snackName"
+                name="snackName"
+                required>
+            </div>
+            <div>
+              <label for="price" class="block text-sm font-medium text-gray-700 mb-2">
+                Price:
+              </label>
+              <input 
+                type="number" 
+                id="price"
+                class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                [(ngModel)]="newSnack.price"
+                name="price"
+                step="0.01"
+                min="0"
+                required>
+            </div>
+            <div>
+              <label for="snackTypeId" class="block text-sm font-medium text-gray-700 mb-2">
+                Snack Type ID:
+              </label>
+              <input 
+                type="number" 
+                id="snackTypeId"
+                class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                [(ngModel)]="newSnack.snackTypeId"
+                name="snackTypeId"
+                min="1"
+                required>
+            </div>
+            <div>
+              <label for="snackTypeName" class="block text-sm font-medium text-gray-700 mb-2">
+                Snack Type Name:
+              </label>
+              <input 
+                type="text" 
+                id="snackTypeName"
+                class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                [(ngModel)]="newSnack.snackTypeName"
+                name="snackTypeName"
+                required>
+            </div>
+          </div>
+          <div class="mt-6">
+            <label for="imageFile" class="block text-sm font-medium text-gray-700 mb-2">
+              Select Image:
+            </label>
+            <div class="flex items-center space-x-4">
+              <input 
+                type="file" 
+                id="imageFile"
+                class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                (change)="onFileSelected($event)"
+                accept="image/*">
+            </div>
+            <div *ngIf="selectedFile" class="mt-2 text-sm text-gray-600">
+              Selected: {{ selectedFile.name }}
+            </div>
+          </div>
+          <div class="mt-8 flex justify-end space-x-4">
+            <button 
+              type="button" 
+              class="px-6 py-2 bg-gray-600 text-white font-medium rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition duration-200"
+              (click)="closeAddForm()">
+              Cancel
+            </button>
+            <button 
+              type="submit" 
+              class="px-6 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition duration-200"
+              [disabled]="!snackForm.form.valid">
+              Add Snack
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Snack Modal -->
+  <div *ngIf="isEditing && selectedSnack" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-screen overflow-y-auto">
+      <div class="flex justify-between items-center bg-gray-50 px-6 py-4 border-b border-gray-200 rounded-t-lg">
+        <h4 class="text-xl font-semibold text-gray-800">Edit Snack</h4>
+        <button 
+          class="text-gray-400 hover:text-gray-600 focus:outline-none focus:text-gray-600 transition duration-200"
+          (click)="cancelEdit()">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+      <div class="p-6">
+        <form (ngSubmit)="updateSnack()" #editForm="ngForm">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label for="editSnackName" class="block text-sm font-medium text-gray-700 mb-2">
+                Snack Name:
+              </label>
+              <input 
+                type="text" 
+                id="editSnackName"
+                class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                [(ngModel)]="selectedSnack.snackName"
+                name="editSnackName"
+                required>
+            </div>
+            <div>
+              <label for="editPrice" class="block text-sm font-medium text-gray-700 mb-2">
+                Price:
+              </label>
+              <input 
+                type="number" 
+                id="editPrice"
+                class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                [(ngModel)]="selectedSnack.price"
+                name="editPrice"
+                step="0.01"
+                min="0"
+                required>
+            </div>
+            <div>
+              <label for="editSnackTypeId" class="block text-sm font-medium text-gray-700 mb-2">
+                Snack Type ID:
+              </label>
+              <input 
+                type="number" 
+                id="editSnackTypeId"
+                class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                [(ngModel)]="selectedSnack.snackTypeId"
+                name="editSnackTypeId"
+                min="1"
+                required>
+            </div>
+            <div>
+              <label for="editSnackTypeName" class="block text-sm font-medium text-gray-700 mb-2">
+                Snack Type Name:
+              </label>
+              <input 
+                type="text" 
+                id="editSnackTypeName"
+                class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                [(ngModel)]="selectedSnack.snackTypeName"
+                name="editSnackTypeName"
+                required>
+            </div>
+          </div>
+          <div class="mt-6">
+            <label for="editImageFile" class="block text-sm font-medium text-gray-700 mb-2">
+              Select New Image (optional):
+            </label>
+            <div class="flex items-center space-x-4">
+              <input 
+                type="file" 
+                id="editImageFile"
+                class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                (change)="onEditFileSelected($event)"
+                accept="image/*">
+            </div>
+            <div *ngIf="editSelectedFile" class="mt-2 text-sm text-gray-600">
+              New image selected: {{ editSelectedFile.name }}
+            </div>
+            <div *ngIf="selectedSnack.imageUrl && !editSelectedFile" class="mt-2">
+              <img [src]="selectedSnack.imageUrl" alt="Current image" class="w-20 h-20 object-cover rounded border">
+              <p class="text-xs text-gray-500 mt-1">Current image (will be replaced if new file is selected)</p>
+            </div>
+          </div>
+          <div class="mt-8 flex justify-end space-x-4">
+            <button 
+              type="button" 
+              class="px-6 py-2 bg-gray-600 text-white font-medium rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition duration-200"
+              (click)="cancelEdit()">
+              Cancel
+            </button>
+            <button 
+              type="submit" 
+              class="px-6 py-2 bg-green-600 text-white font-medium rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition duration-200"
+              [disabled]="!editForm.form.valid">
+              Update Snack
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Snacks List -->
+  <div class="bg-white shadow-lg rounded-lg">
+    <div class="bg-gray-50 px-6 py-4 border-b border-gray-200 rounded-t-lg">
+      <!-- <h4 class="text-xl font-semibold text-gray-800">Snacks List</h4> -->
+    </div>
+    <div class="p-6">
+      <div *ngIf="snacks.length === 0 && !isLoading" class="text-center py-8 text-gray-500">
+        No snacks found.
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" *ngIf="snacks.length > 0">
+        <div *ngFor="let snack of snacks" class="bg-white border border-gray-200 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200">
+          <img 
+            *ngIf="snack.imageUrl" 
+            [src]="snack.imageUrl" 
+            class="w-full h-48 object-cover rounded-t-lg"
+            [alt]="snack.snackName"
+            onerror="this.style.display='none'">
+          <div class="p-4">
+            <h5 class="text-lg font-semibold text-gray-900 mb-2">{{ snack.snackName }}</h5>
+            <div class="text-sm text-gray-600 space-y-1 mb-4">
+              <!-- <p><span class="font-medium">Type:</span> {{ snack.snackTypeName }}</p> -->
+              <!-- <p><span class="font-medium">Type ID:</span> {{ snack.snackTypeId }}</p> -->
+              <p><span class="font-medium text-xl">Price:</span> ${{ snack.price | number:'1.2-2' }}</p>
+            </div>
+            <div class="flex space-x-2">
+              <button 
+                type="button" 
+                class="flex-1 px-3 py-2 bg-yellow-500 text-white text-sm font-medium rounded hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 transition duration-200"
+                (click)="editSnack(snack)">
+                Edit
+              </button>
+             <button 
+  type="button"
+  class="flex-1 px-3 py-2 bg-red-600 text-white text-sm font-medium rounded hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition duration-200"
+  (click)="deleteSnack(+snack.snackId!)">
+  Delete
+</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+            

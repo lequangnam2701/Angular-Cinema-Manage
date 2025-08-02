@@ -1,0 +1,91 @@
+<div class="p-5 max-w-6xl mx-auto">
+  <h2 class="text-2xl font-bold mb-6">Snacks Menu</h2>
+  <div *ngIf="loading" class="text-center py-5 text-lg">
+    Loading snacks...
+  </div>
+  <div
+    *ngIf="error"
+    class="text-center py-5 text-lg text-red-600 bg-red-100 border border-red-300 rounded">
+    {{ error }}
+  </div>
+
+  <div
+    *ngIf="!loading && !error"
+    class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 mt-5">
+    <div
+      *ngFor="let snack of snacks"
+      class="border border-gray-300 rounded-lg overflow-hidden shadow-md hover:shadow-lg hover:-translate-y-1 transition-all duration-200 cursor-pointer"
+      (click)="toggleSnackSelection(snack)">
+      <img
+        [src]="snack.imageUrl"
+        [alt]="snack.snackName"
+        class="w-full h-48 object-cover"
+        (error)="onImageError($event)"
+      />
+      <div class="p-4">
+        <h3 class="text-lg font-bold text-gray-800 mb-2">
+          {{ snack.snackName }}
+        </h3>
+        <p class="text-base font-bold text-green-600">
+          {{ formatPrice(snack.price) }}
+        </p>
+        <div class="flex items-center justify-between mt-3">
+          <button
+            (click)="$event.stopPropagation(); decreaseQuantity(snack)"
+            [disabled]="getSnackQuantity(snack) === 0"
+            class="bg-gray-200 text-gray-700 px-3 py-1 rounded-full hover:bg-gray-300 disabled:opacity-50" >
+            -
+          </button>
+          <span class="text-lg font-semibold text-gray-800">{{
+            getSnackQuantity(snack)
+          }}</span>
+          <button
+            (click)="$event.stopPropagation(); increaseQuantity(snack)"
+            class="bg-blue-500 text-white px-3 py-1 rounded-full hover:bg-blue-600">
+            +
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div
+    *ngIf="totalItems > 0"
+    class="mt-8 p-6 bg-white rounded-lg shadow-xl border border-blue-200">
+    <h3 class="text-xl font-semibold mb-4 text-gray-800">
+      Đồ ăn đã chọn:
+    </h3>
+    <div class="space-y-2 mb-4">
+      <div
+        *ngFor="let item of selectedSnacksMap | keyvalue"
+        class="flex justify-between items-center text-gray-700">
+        <span class="font-medium"
+          >{{ item.value.snack.snackName }} x {{ item.value.quantity }}</span>
+        <span class="font-bold">{{
+          formatPrice(item.value.snack.price * item.value.quantity)
+        }}</span>
+      </div>
+    </div>
+    <div
+      class="border-t border-gray-300 pt-4 mt-4 flex justify-between items-center" >
+      <span class="text-lg font-semibold text-gray-800"
+        >Tổng số món:</span>
+      <span class="text-xl font-bold text-blue-600">{{ totalItems }}</span>
+    </div>
+    <div class="flex justify-between items-center mt-2">
+      <span class="text-lg font-semibold text-gray-800"
+        >Tổng cộng tiền:</span>
+      <span class="text-2xl font-extrabold text-orange-600">{{
+        formatPrice(totalSnackPrice)
+      }}</span>
+    </div>
+    <div class="mt-6 flex justify-end">
+      <button
+        (click)="goToSummary()"
+        class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-8 rounded-lg text-xl transition duration-300 ease-in-out">
+        Tiếp theo
+      </button>
+    </div>
+  </div>
+  
+</div>

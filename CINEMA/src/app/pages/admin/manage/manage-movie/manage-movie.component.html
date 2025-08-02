@@ -1,0 +1,380 @@
+<div class="max-w-7xl mx-auto p-6">
+  <!-- Header -->
+  <div class="bg-white rounded-xl p-6 mb-6 shadow-sm">
+    <h1 class="text-3xl font-bold text-gray-800 mb-8">
+      Movie Management System
+    </h1>
+  </div>
+
+  <!-- Tabs -->
+  <div class="flex gap-0 mb-6">
+    <div class="py-3 px-6 bg-white border border-slate-200 text-slate-500 cursor-pointer transition-all duration-200 font-medium rounded-l-lg hover:bg-slate-50"
+         [class.!bg-blue-500]="activeTab === 'movies'"
+         [class.!text-white]="activeTab === 'movies'"
+         [class.!border-blue-500]="activeTab === 'movies'"
+         (click)="activeTab = 'movies'">
+      Movies List
+    </div>
+    <div class="py-3 px-6 bg-white border border-slate-200 text-slate-500 cursor-pointer transition-all duration-200 font-medium rounded-r-lg hover:bg-slate-50"
+         [class.!bg-blue-500]="activeTab === 'add'"
+         [class.!text-white]="activeTab === 'add'"
+         [class.!border-blue-500]="activeTab === 'add'"
+         (click)="activeTab = 'add'">
+      Add Movie
+    </div>
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="error" class="bg-red-50 text-red-600 p-3 rounded-lg mb-4 flex justify-between items-center">
+    <span>{{ error }}</span>
+    <button (click)="clearError()" class="bg-none border-none text-red-600 cursor-pointer text-lg p-0 w-5 h-5">×</button>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="flex justify-center items-center py-10 text-slate-500">Đang tải...</div>
+
+  <!-- Movies List Section -->
+  <div *ngIf="activeTab === 'movies'" class="bg-white rounded-xl p-6 shadow-sm">
+    <!-- Search Controls -->
+    <div class="flex gap-3 mb-6 flex-wrap items-center">
+      <input type="text" 
+             class="flex-1 min-w-[300px] py-3 px-4 border border-slate-200 rounded-lg text-sm bg-slate-50 focus:outline-none focus:border-blue-500 focus:bg-white" 
+             placeholder="Search by title..." 
+             [(ngModel)]="searchTerm"
+             (keyup.enter)="searchMovies()">
+      <button class="py-3 px-5 border-none rounded-lg font-medium cursor-pointer transition-all duration-200 text-sm bg-blue-500 text-white hover:bg-blue-600 disabled:opacity-60 disabled:cursor-not-allowed" 
+              (click)="searchMovies()">Search</button>
+      <button class="py-3 px-5 border-none rounded-lg font-medium cursor-pointer transition-all duration-200 text-sm bg-slate-500 text-white hover:bg-slate-600 disabled:opacity-60 disabled:cursor-not-allowed" 
+              (click)="showAllMovies()">Show All</button>
+      
+      <!-- <div class="flex gap-3 items-center ml-auto">
+        <select class="py-2 px-3 border border-slate-200 rounded-md bg-white" [(ngModel)]="pageSize">
+          <option value="10">10 per page</option>
+          <option value="20">20 per page</option>
+          <option value="50">50 per page</option>
+        </select>
+        <button class="py-3 px-5 border-none rounded-lg font-medium cursor-pointer transition-all duration-200 text-sm bg-slate-500 text-white hover:bg-slate-600 disabled:opacity-60 disabled:cursor-not-allowed" 
+                (click)="loadPaginated()">Load More</button>
+      </div> -->
+    </div>
+
+    <!-- No Movies Message -->
+    <div *ngIf="movies.length === 0 && !loading" class="text-center py-10 text-slate-500">
+      Không có movies nào.
+    </div>
+
+    <!-- Movies Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" *ngIf="movies.length > 0">
+      <div class="bg-white border border-slate-200 rounded-xl p-5 transition-all duration-200 relative hover:-translate-y-1 hover:shadow-lg" 
+           *ngFor="let movie of movies">
+        <h3 class="text-xl font-semibold text-slate-800 mb-3">{{ movie.title }}</h3>
+        <div class="flex flex-col gap-2 mb-3">
+          <div class="flex items-center gap-2 text-slate-500 text-sm">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+            </svg>
+            Rating: <span class="inline-block py-1 px-2 bg-slate-100 text-slate-500 rounded text-xs font-medium">{{ movie.ageRating || 'N/A' }}</span>
+          </div>
+          <div class="flex items-center gap-2 text-slate-500 text-sm">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm3.5 6L12 10.5 8.5 8 12 5.5 15.5 8zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/>
+            </svg>
+            Runtime: {{ movie.runtimeMin }} min
+          </div>
+          <div class="flex items-center gap-2 text-slate-500 text-sm">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/>
+            </svg>
+            Release: {{ movie.releaseDate | date:'yyyy-MM-dd' }}
+          </div>
+        </div>
+        <p class="text-slate-500 text-sm leading-relaxed mb-4">{{ movie.description }}</p>
+        <div class="flex gap-2 justify-end">
+          <button class="py-2 px-3 border-none rounded-md font-medium cursor-pointer transition-all duration-200 text-xs bg-amber-500 text-white hover:bg-amber-600 disabled:opacity-60 disabled:cursor-not-allowed" 
+                  (click)="editMovie(movie)" 
+                  [disabled]="loading">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+            </svg>
+          </button>
+          <button class="py-2 px-3 border-none rounded-md font-medium cursor-pointer transition-all duration-200 text-xs bg-red-500 text-white hover:bg-red-600 disabled:opacity-60 disabled:cursor-not-allowed" 
+                  (click)="deleteMovie(movie.id)" 
+                  [disabled]="loading">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Movie Form Section -->
+ <div *ngIf="activeTab === 'add'" class="bg-white rounded-xl p-6 shadow-sm">
+    <h3 class="mb-5 text-lg font-semibold">Thêm Movie Mới</h3>
+    <form (ngSubmit)="addMovie()" #movieForm="ngForm">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
+        <div class="flex flex-col gap-1.5">
+          <label for="title" class="font-medium text-gray-700 text-sm">Tiêu đề:</label>
+          <input type="text" 
+                 id="title" 
+                 name="title" 
+                 class="py-2.5 px-3 border border-slate-200 rounded-md text-sm transition-colors duration-200 focus:outline-none focus:border-blue-500"
+                 [(ngModel)]="newMovie.title" 
+                 required>
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label for="posterImage" class="font-medium text-gray-700 text-sm">Poster Image:</label>
+          <input type="file" 
+                 id="posterImage" 
+                 name="posterImage" 
+                 class="py-2.5 px-3 border border-slate-200 rounded-md text-sm transition-colors duration-200 focus:outline-none focus:border-blue-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                 (change)="onPosterImageSelected($event)"
+                 accept="image/*">
+          <div *ngIf="selectedPosterFile" class="mt-2 text-sm text-gray-600">
+            Đã chọn: {{ selectedPosterFile.name }}
+          </div>
+        </div>
+        
+        <div class="flex flex-col gap-1.5">
+          <label for="headerImage" class="font-medium text-gray-700 text-sm">Header Image:</label>
+          <input type="file" 
+                 id="headerImage" 
+                 name="headerImage" 
+                 class="py-2.5 px-3 border border-slate-200 rounded-md text-sm transition-colors duration-200 focus:outline-none focus:border-blue-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                 (change)="onHeaderImageSelected($event)"
+                 accept="image/*">
+          <div *ngIf="selectedHeaderFile" class="mt-2 text-sm text-gray-600">
+            Đã chọn: {{ selectedHeaderFile.name }}
+          </div>
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label for="rating" class="font-medium text-gray-700 text-sm">Rating:</label>
+          <select id="rating" 
+                  name="rating" 
+                  class="py-2.5 px-3 border border-slate-200 rounded-md text-sm transition-colors duration-200 focus:outline-none focus:border-blue-500"
+                  [(ngModel)]="newMovie.ageRating">
+            <option value="G">G</option>
+            <option value="PG">PG</option>
+            <option value="PG-13">PG-13</option>
+            <option value="R">R</option>
+            <option value="NC-17">NC-17</option>
+          </select>
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+          <label for="statusId" class="font-medium text-gray-700 text-sm">Trạng thái:</label>
+          <select id="statusId" 
+                  name="statusId" 
+                  class="py-2.5 px-3 border border-slate-200 rounded-md text-sm transition-colors duration-200 focus:outline-none focus:border-blue-500"
+                  [(ngModel)]="newMovie.statusId" 
+                  required>
+            <option value="">Chọn trạng thái</option>
+            <option *ngFor="let status of statuses" [value]="status.id">
+              {{ status.name }}
+            </option>
+          </select>
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+          <label for="directorId" class="font-medium text-gray-700 text-sm">Director ID:</label>
+          <input type="number" 
+                 id="directorId" 
+                 name="directorId" 
+                 class="py-2.5 px-3 border border-slate-200 rounded-md text-sm transition-colors duration-200 focus:outline-none focus:border-blue-500"
+                 [(ngModel)]="newMovie.directorId" 
+                 min="1">
+        </div>
+
+        <!-- Trailer Link -->
+        <div class="flex flex-col gap-1.5">
+          <label for="trailerLink" class="font-medium text-gray-700 text-sm">Link Trailer:</label>
+          <input type="url" 
+                 id="trailerLink" 
+                 name="trailerLink" 
+                 class="py-2.5 px-3 border border-slate-200 rounded-md text-sm transition-colors duration-200 focus:outline-none focus:border-blue-500"
+                 [(ngModel)]="newMovie.trailerLink" 
+                 placeholder="https://youtube.com/...">
+        </div>
+
+        <!-- Banner Text -->
+        <div class="flex flex-col gap-1.5">
+          <label for="bannerText" class="font-medium text-gray-700 text-sm">Banner Text:</label>
+          <input type="text" 
+                 id="bannerText" 
+                 name="bannerText" 
+                 class="py-2.5 px-3 border border-slate-200 rounded-md text-sm transition-colors duration-200 focus:outline-none focus:border-blue-500"
+                 [(ngModel)]="newMovie.bannerText" 
+                 placeholder="Text hiển thị trên banner">
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+          <label for="runtimeMin" class="font-medium text-gray-700 text-sm">Thời lượng (phút):</label>
+          <input type="number" 
+                 id="runtimeMin" 
+                 name="runtimeMin" 
+                 class="py-2.5 px-3 border border-slate-200 rounded-md text-sm transition-colors duration-200 focus:outline-none focus:border-blue-500"
+                 [(ngModel)]="newMovie.runtimeMin" 
+                 min="1">
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label for="releaseDate" class="font-medium text-gray-700 text-sm">Ngày phát hành:</label>
+          <input type="date" 
+                 id="releaseDate" 
+                 name="releaseDate" 
+                 class="py-2.5 px-3 border border-slate-200 rounded-md text-sm transition-colors duration-200 focus:outline-none focus:border-blue-500"
+                 [(ngModel)]="newMovie.releaseDate">
+        </div>
+      </div>
+
+      <!-- Synopsis -->
+      <div class="flex flex-col gap-1.5 mb-5">
+        <label for="synopsis" class="font-medium text-gray-700 text-sm">Synopsis (Tóm tắt):</label>
+        <textarea id="synopsis" 
+                  name="synopsis" 
+                  class="py-2.5 px-3 border border-slate-200 rounded-md text-sm transition-colors duration-200 resize-y min-h-[60px] focus:outline-none focus:border-blue-500"
+                  [(ngModel)]="newMovie.synopsis" 
+                  rows="3"
+                  placeholder="Tóm tắt ngắn gọn về phim"></textarea>
+      </div>
+
+      <!-- Cast Members Section -->
+      <div class="mb-5">
+        <div class="flex justify-between items-center mb-3">
+          <label class="font-medium text-gray-700 text-sm">Cast Member IDs (comma-separated):</label>
+        </div>
+        <input type="text" 
+               id="castMemberIds" 
+               name="castMemberIds" 
+               class="w-full py-2.5 px-3 border border-slate-200 rounded-md text-sm transition-colors duration-200 focus:outline-none focus:border-blue-500"
+               [(ngModel)]="castMemberIdsInput" 
+               (input)="handleCastMemberIds($event)"
+               placeholder="1, 2, 3">
+      </div>
+
+      <!-- Genres Section -->
+      <div class="mb-5">
+        <div class="flex justify-between items-center mb-3">
+          <label class="font-medium text-gray-700 text-sm">Genre IDs (comma-separated):</label>
+        </div>
+        <input type="text" 
+               id="genreIds" 
+               name="genreIds" 
+               class="w-full py-2.5 px-3 border border-slate-200 rounded-md text-sm transition-colors duration-200 focus:outline-none focus:border-blue-500"
+               [(ngModel)]="genreIdsInput" 
+               (input)="handleGenreIds($event)"
+               placeholder="1, 2, 3">
+      </div>
+
+      <!-- Description -->
+      <div class="flex flex-col gap-1.5 mb-5">
+        <label for="description" class="font-medium text-gray-700 text-sm">Mô tả:</label>
+        <textarea id="description" 
+                  name="description" 
+                  class="py-2.5 px-3 border border-slate-200 rounded-md text-sm transition-colors duration-200 resize-y min-h-[80px] focus:outline-none focus:border-blue-500"
+                  [(ngModel)]="newMovie.description" 
+                  rows="4"
+                  placeholder="Mô tả chi tiết về phim"></textarea>
+      </div>
+
+      <!-- Action buttons -->
+      <div class="flex gap-3 justify-end">
+        <button type="button" 
+                class="py-3 px-5 border-none rounded-lg font-medium cursor-pointer transition-all duration-200 text-sm bg-slate-500 text-white hover:bg-slate-600 disabled:opacity-60 disabled:cursor-not-allowed"
+                (click)="resetForm()">Reset</button>
+        <button type="submit" 
+                class="py-3 px-5 border-none rounded-lg font-medium cursor-pointer transition-all duration-200 text-sm bg-blue-500 text-white hover:bg-blue-600 disabled:opacity-60 disabled:cursor-not-allowed"
+                [disabled]="!movieForm.form.valid || loading">
+          {{ loading ? 'Đang xử lý...' : 'Thêm Movie' }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Edit Movie Modal -->
+  <div *ngIf="isEditing && selectedMovie" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between p-6 border-b border-slate-200">
+        <h3 class="text-xl font-semibold text-gray-900">Chỉnh sửa Movie</h3>
+        <button type="button" 
+                class="text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg p-2 transition-colors duration-200"
+                (click)="cancelEdit()">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+      
+      <!-- Modal Body -->
+      <div class="p-6">
+        <form (ngSubmit)="updateMovie()" #editForm="ngForm">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
+            <div class="flex flex-col gap-1.5">
+              <label for="editTitle" class="font-medium text-gray-700 text-sm">Tiêu đề:</label>
+              <input type="text" 
+                     id="editTitle" 
+                     name="editTitle" 
+                     class="py-2.5 px-3 border border-slate-200 rounded-md text-sm transition-colors duration-200 focus:outline-none focus:border-blue-500"
+                     [(ngModel)]="selectedMovie.title" 
+                     required>
+            </div>
+            <div class="flex flex-col gap-1.5">
+              <label for="editRating" class="font-medium text-gray-700 text-sm">Rating:</label>
+              <select id="editRating" 
+                      name="editRating" 
+                      class="py-2.5 px-3 border border-slate-200 rounded-md text-sm transition-colors duration-200 focus:outline-none focus:border-blue-500"
+                      [(ngModel)]="selectedMovie.ageRating">
+                <option value="G">G</option>
+                <option value="PG">PG</option>
+                <option value="PG-13">PG-13</option>
+                <option value="R">R</option>
+                <option value="NC-17">NC-17</option>
+              </select>
+            </div>
+            <div class="flex flex-col gap-1.5">
+              <label for="editRuntimeMin" class="font-medium text-gray-700 text-sm">Thời lượng (phút):</label>
+              <input type="number" 
+                     id="editRuntimeMin" 
+                     name="editRuntimeMin" 
+                     class="py-2.5 px-3 border border-slate-200 rounded-md text-sm transition-colors duration-200 focus:outline-none focus:border-blue-500"
+                     [(ngModel)]="selectedMovie.runtimeMin" 
+                     min="1">
+            </div>
+            <div class="flex flex-col gap-1.5">
+              <label for="editReleaseDate" class="font-medium text-gray-700 text-sm">Ngày phát hành:</label>
+              <input type="date" 
+                     id="editReleaseDate" 
+                     name="editReleaseDate" 
+                     class="py-2.5 px-3 border border-slate-200 rounded-md text-sm transition-colors duration-200 focus:outline-none focus:border-blue-500"
+                     [(ngModel)]="selectedMovie.releaseDate">
+            </div>
+          </div>
+          <div class="flex flex-col gap-1.5 mb-6">
+            <label for="editDescription" class="font-medium text-gray-700 text-sm">Mô tả:</label>
+            <textarea id="editDescription" 
+                      name="editDescription" 
+                      class="py-2.5 px-3 border border-slate-200 rounded-md text-sm transition-colors duration-200 resize-y min-h-[100px] focus:outline-none focus:border-blue-500"
+                      [(ngModel)]="selectedMovie.description" 
+                      rows="4"></textarea>
+          </div>
+          
+          <!-- Modal Footer -->
+          <div class="flex gap-3 justify-end pt-4 border-t border-slate-200">
+            <button type="button" 
+                    class="py-2.5 px-5 border border-slate-300 rounded-lg font-medium cursor-pointer transition-all duration-200 text-sm text-slate-700 hover:bg-slate-50"
+                    (click)="cancelEdit()">
+              Hủy
+            </button>
+            <button type="submit" 
+                    class="py-2.5 px-5 border-none rounded-lg font-medium cursor-pointer transition-all duration-200 text-sm bg-blue-500 text-white hover:bg-blue-600 disabled:opacity-60 disabled:cursor-not-allowed"
+                    [disabled]="!editForm.form.valid || loading">
+              <span *ngIf="loading">Đang cập nhật...</span>
+              <span *ngIf="!loading">Cập nhật</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
